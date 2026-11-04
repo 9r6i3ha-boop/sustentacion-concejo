@@ -93,9 +93,20 @@ body.light svg rect[fill="#3a4349"]{fill:#cfd6da}
 body.light svg line[stroke="#2b3238"]{stroke:var(--line)}
 body.light svg circle[stroke="#2b3238"]{stroke:#dfe5e8}
 body.light .bar{background:var(--green)}
-.theme{position:absolute;left:7vw;bottom:2.6vh;font-size:1.9vh;color:var(--muted);background:none;border:1px solid var(--line);border-radius:2vh;padding:.4vh 1.2vw;cursor:pointer;font-family:inherit;z-index:3}
-.slide .theme{display:none}.cover .theme{display:inline-block}
-@media print{html,body{overflow:visible;background:#fff;color:#000}.slide{position:relative;display:flex!important;opacity:1;page-break-after:always;height:100vh}.foot,.hint,.bar,.theme{display:none}}
+
+/* controles */
+.ctl{position:absolute;z-index:6;font-family:inherit;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;transition:background .2s,transform .15s}
+.nav{top:50%;transform:translateY(-50%);width:6vh;height:6vh;border-radius:50%;background:var(--green);color:#fff;font-size:3.4vh;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.35);opacity:.92}
+.nav:hover{opacity:1;transform:translateY(-50%) scale(1.06)}
+.nav.prev{left:1.2vw}.nav.next{right:1.2vw}
+.theme{bottom:2.2vh;left:1.2vw;width:4.6vh;height:4.6vh;padding:0;border-radius:50%;background:#fff;color:#121517;font-size:2vh;font-weight:600;gap:.8vh;box-shadow:0 2px 10px rgba(0,0,0,.35);border:2px solid var(--green)}
+.theme i{font-style:normal;font-size:2.4vh;line-height:1}
+.theme span{display:none}
+body.oncover .theme{left:7vw;bottom:2.6vh;width:auto;height:5.2vh;padding:0 1.6vh 0 1.2vh;border-radius:2.6vh}
+body.oncover .theme span{display:inline}
+body.light .theme{background:#15191c;color:#fff;border-color:var(--green)}
+body.light .nav{box-shadow:0 2px 10px rgba(0,0,0,.2)}
+@media print{html,body{overflow:visible;background:#fff;color:#000}.slide{position:relative;display:flex!important;opacity:1;page-break-after:always;height:100vh}.foot,.hint,.bar,.ctl{display:none}}
 </style>
 </head>
 <body>
@@ -108,8 +119,7 @@ body.light .bar{background:var(--green)}
   <h1>Gestión tributaria <em>2026</em></h1>
   <p class="sub">Recaudo, cartera y cobro: dónde estamos y qué se está haciendo</p>
   <p class="who"><b>Harold Styven Rivera Botia</b>Jefe de Oficina · Secretaría de Hacienda y Finanzas Públicas</p>
-  <div class="hint">→ para avanzar · B cambia el fondo</div>
-  <button class="theme" id="theme" type="button">Fondo claro</button>
+  <div class="hint">→ o clic en las flechas para avanzar · B cambia el fondo</div>
 </section>
 
 <!-- 1 Contribuyentes -->
@@ -403,16 +413,21 @@ body.light .bar{background:var(--green)}
 </section>
 
 <div class="bar" id="bar"></div>
+<button class="ctl nav prev" id="prev" type="button" aria-label="Anterior">‹</button>
+<button class="ctl nav next" id="next" type="button" aria-label="Siguiente">›</button>
+<button class="ctl theme" id="theme" type="button"><i>☀</i><span>Fondo claro</span></button>
 </div>
 <script>
 const slides=[...document.querySelectorAll('.slide')]; let i=0;
-function go(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('on',k===i));document.getElementById('bar').style.width=(i/(slides.length-1)*100)+'%';location.hash=i;}
+function go(n){i=Math.max(0,Math.min(slides.length-1,n));document.body.classList.toggle('oncover',slides[i].classList.contains('cover'));slides.forEach((s,k)=>s.classList.toggle('on',k===i));document.getElementById('bar').style.width=(i/(slides.length-1)*100)+'%';location.hash=i;}
 addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();go(i+1)}else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();go(i-1)}else if(e.key==='Home')go(0);else if(e.key==='End')go(slides.length-1);else if(e.key==='f'||e.key==='F'){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}});
 addEventListener('click',e=>{if(e.clientX>innerWidth*0.6)go(i+1);else if(e.clientX<innerWidth*0.2)go(i-1)});
 let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX);addEventListener('touchend',e=>{if(tx==null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>40)go(d<0?i+1:i-1);tx=null});
-function setTheme(l){document.body.classList.toggle('light',l);const b=document.getElementById('theme');if(b)b.textContent=l?'Fondo oscuro':'Fondo claro';try{localStorage.setItem('expo-theme',l?'light':'dark')}catch(e){}}
+function setTheme(l){document.body.classList.toggle('light',l);const b=document.getElementById('theme');if(b){b.querySelector('span').textContent=l?'Fondo oscuro':'Fondo claro';b.querySelector('i').textContent=l?'☾':'☀'}try{localStorage.setItem('expo-theme',l?'light':'dark')}catch(e){}}
 try{setTheme(localStorage.getItem('expo-theme')==='light')}catch(e){}
 document.getElementById('theme').addEventListener('click',e=>{e.stopPropagation();setTheme(!document.body.classList.contains('light'))});
+document.getElementById('prev').addEventListener('click',e=>{e.stopPropagation();go(i-1)});
+document.getElementById('next').addEventListener('click',e=>{e.stopPropagation();go(i+1)});
 addEventListener('keydown',e=>{if(e.key==='b'||e.key==='B')setTheme(!document.body.classList.contains('light'))});
 go(parseInt(location.hash.slice(1))||0);
 </script>
