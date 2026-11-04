@@ -76,7 +76,26 @@ svg text{font-family:inherit}
 .leg i{display:block;font-style:normal;color:var(--ink);font-weight:600}
 .leg small{display:block;font-size:1.5vh;color:#c9d0d4;line-height:1.25;margin-top:.3vh}
 .lbl{font-size:1.9vh;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 1vh}
-@media print{html,body{overflow:visible;background:#fff;color:#000}.slide{position:relative;display:flex!important;opacity:1;page-break-after:always;height:100vh}.foot,.hint,.bar{display:none}}
+
+/* ---- modo claro ---- */
+body.light{--bg:#ffffff;--bg2:#f2f6f3;--ink:#121517;--ink2:#2b3238;--muted:#5c666d;--green:#07aa1b;--green2:#0b8f1f;--line:#d6dde0}
+body.light .stat .l,body.light .lead,body.light .chip,body.light .card .q,body.light .leg div,body.light .renta .r,body.light .pp .k,body.light .cover .sub{color:var(--ink)}
+body.light .note b,body.light .foot b{color:var(--ink)}
+body.light .foot,body.light .card .a,body.light .leg small,body.light .renta .sub,body.light .cover .who,body.light .hint{color:var(--muted)}
+body.light .chip{border-color:#b9c3c8}
+body.light .brand{box-shadow:0 1px 6px rgba(0,0,0,.18);border:1px solid var(--line)}
+body.light .renta .r .b{background:#cfd6da;color:var(--ink)}
+body.light .renta .r.hi .b{background:var(--green);color:#fff}
+body.light svg text[fill="#f4f5f3"],body.light svg text[fill="#e4e8ea"]{fill:var(--ink)}
+body.light svg text[fill="#aab3b9"]{fill:var(--muted)}
+body.light svg g[fill="#e4e8ea"],body.light svg g[fill="#b8bfc4"]{fill:var(--ink)}
+body.light svg rect[fill="#3a4349"]{fill:#cfd6da}
+body.light svg line[stroke="#2b3238"]{stroke:var(--line)}
+body.light svg circle[stroke="#2b3238"]{stroke:#dfe5e8}
+body.light .bar{background:var(--green)}
+.theme{position:absolute;left:7vw;bottom:2.6vh;font-size:1.9vh;color:var(--muted);background:none;border:1px solid var(--line);border-radius:2vh;padding:.4vh 1.2vw;cursor:pointer;font-family:inherit;z-index:3}
+.slide .theme{display:none}.cover .theme{display:inline-block}
+@media print{html,body{overflow:visible;background:#fff;color:#000}.slide{position:relative;display:flex!important;opacity:1;page-break-after:always;height:100vh}.foot,.hint,.bar,.theme{display:none}}
 </style>
 </head>
 <body>
@@ -89,7 +108,8 @@ svg text{font-family:inherit}
   <h1>Gestión tributaria <em>2026</em></h1>
   <p class="sub">Recaudo, cartera y cobro: dónde estamos y qué se está haciendo</p>
   <p class="who"><b>Harold Styven Rivera Botia</b>Jefe de Oficina · Secretaría de Hacienda y Finanzas Públicas</p>
-  <div class="hint">→ para avanzar</div>
+  <div class="hint">→ para avanzar · B cambia el fondo</div>
+  <button class="theme" id="theme" type="button">Fondo claro</button>
 </section>
 
 <!-- 1 Contribuyentes -->
@@ -390,6 +410,10 @@ function go(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s
 addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();go(i+1)}else if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();go(i-1)}else if(e.key==='Home')go(0);else if(e.key==='End')go(slides.length-1);else if(e.key==='f'||e.key==='F'){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}});
 addEventListener('click',e=>{if(e.clientX>innerWidth*0.6)go(i+1);else if(e.clientX<innerWidth*0.2)go(i-1)});
 let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX);addEventListener('touchend',e=>{if(tx==null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>40)go(d<0?i+1:i-1);tx=null});
+function setTheme(l){document.body.classList.toggle('light',l);const b=document.getElementById('theme');if(b)b.textContent=l?'Fondo oscuro':'Fondo claro';try{localStorage.setItem('expo-theme',l?'light':'dark')}catch(e){}}
+try{setTheme(localStorage.getItem('expo-theme')==='light')}catch(e){}
+document.getElementById('theme').addEventListener('click',e=>{e.stopPropagation();setTheme(!document.body.classList.contains('light'))});
+addEventListener('keydown',e=>{if(e.key==='b'||e.key==='B')setTheme(!document.body.classList.contains('light'))});
 go(parseInt(location.hash.slice(1))||0);
 </script>
 </body>
